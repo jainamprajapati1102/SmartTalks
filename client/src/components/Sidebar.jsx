@@ -1,10 +1,38 @@
 // components/Sidebar.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
+import { search_user } from "../services/userService";
+import placeholderImg from "../assets/placeholder.png";
+import { useChat } from "../context/SelectedUserContext";
 
 const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
   const tabs = ["All", "Unread", "Favorites", "Groups"];
+  const [search_result, setSearch_result] = useState([]);
+  const { setSelectedUser } = useChat();
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!search?.trim() === "") {
+        setSearch_result([]);
+        return;
+      }
 
+      try {
+        const formdata = new FormData();
+        formdata.append("mobile", search);
+        const response = await search_user(formdata);
+        setSearch_result(response.data.find_user);
+        setSelectedUser(response.data.find_user);
+      } catch (error) {
+        console.error("Search error:", error.message);
+      }
+    };
+
+    const delayDebounce = setTimeout(() => {
+      fetchSearchResults();
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
   return (
     <div className="w-[350px] bg-white border-r shadow-sm flex flex-col">
       <Header />
@@ -39,7 +67,21 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
 
       {/* Chat List */}
       <ul className="overflow-y-auto flex-1">
-        <li className="p-4 hover:bg-gray-100 cursor-pointer ">User 1</li>
+        {Array.isArray(search_result) &&
+          search_result.length > 0 &&
+          search_result.map((item, index) => (
+            <li
+              key={index}
+              className="p-4 hover:bg-gray-100 cursor-pointer flex items-center gap-4"
+            >
+              <img
+                src={item.profilePic ? item.profilePic : placeholderImg}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover"
+              />
+              <span>{item.name}</span>
+            </li>
+          ))}
       </ul>
     </div>
   );

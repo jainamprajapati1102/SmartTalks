@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useSocket } from "../hooks/useSocket";
-
+// import { useSocket } from "../hooks/useSocket";
+import { FaPaperPlane } from "react-icons/fa";
+import { useChat } from "../context/SelectedUserContext";
 const ChatRoom = () => {
-  const socket = useSocket("http://localhost:5000");
+  // const socket = useSocket("http://localhost:5000");
   const [message, setMessage] = useState("");
-
+  const { selectedUser } = useChat();
   const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    socket?.on("receive_message", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
-  }, [socket]);
+  // useEffect(() => {
+  //   socket?.on("receive_message", (data) => {
+  //     setMessages((prev) => [...prev, data]);
+  //   });
+  // }, [socket]);
 
   const sendMessage = () => {
     if (!message.trim()) return;
-    socket.emit("send_message", { text: message });
+    // socket.emit("send_message", { text: message });
     setMessages((prev) => [...prev, { text: message }]);
     setMessage("");
   };
@@ -26,7 +27,7 @@ const ChatRoom = () => {
 
       {/* Chat Area */}
       <div className="flex flex-col flex-1 h-full">
-        <div className="bg-white p-2 font-semibold">Chat with User</div>
+        <div className="bg-white p-2 font-semibold">{selectedUser ? `Chat with User ${selectedUser.name}`:'No user Selected'}</div>
 
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
           {messages.map((msg, idx) => (
@@ -55,9 +56,10 @@ const ChatRoom = () => {
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full"
+            className="bg-blue-600 text-white px-6 py-2 rounded-full cursor-pointer"
           >
-            Send
+            {/* Send */}
+            <FaPaperPlane size={20} style={{ cursor: "pointer" }} />
           </button>
         </div>
       </div>

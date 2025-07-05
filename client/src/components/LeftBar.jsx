@@ -1,6 +1,8 @@
 import React from "react";
 import { FaComments, FaUserFriends, FaUserCircle, FaCog } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
+import placeholderImg from "../assets/placeholder.png";
+
 
 // Tooltip Wrapper Component
 const TooltipIcon = ({ children, label }) => (
@@ -55,7 +57,7 @@ const LeftBar = () => {
         </TooltipIcon>
         <TooltipIcon label="Profile">
           <img
-            src="https://via.placeholder.com/40"
+            src={placeholderImg}
             alt="User"
             className="w-8 h-8 rounded-full object-cover"
           />
