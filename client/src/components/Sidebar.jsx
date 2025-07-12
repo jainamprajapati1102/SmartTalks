@@ -4,14 +4,16 @@ import Header from "./Header";
 import { search_user } from "../services/userService";
 import placeholderImg from "../assets/placeholder.png";
 import { useChat } from "../context/SelectedUserContext";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
   const tabs = ["All", "Unread", "Favorites", "Groups"];
   const [search_result, setSearch_result] = useState([]);
-  const { setSelectedUser } = useChat();
+  let { setSelectedUser } = useChat();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (!search?.trim() === "") {
+      if (!search?.trim()) {
         setSearch_result([]);
         return;
       }
@@ -21,7 +23,7 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
         formdata.append("mobile", search);
         const response = await search_user(formdata);
         setSearch_result(response.data.find_user);
-        setSelectedUser(response.data.find_user);
+        // setSelectedUser(response.data.find_user);
       } catch (error) {
         console.error("Search error:", error.message);
       }
@@ -34,7 +36,7 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
     return () => clearTimeout(delayDebounce);
   }, [search]);
   return (
-    <div className="w-[350px] bg-white border-r shadow-sm flex flex-col">
+    <div className="w-[450px] bg-white border-r shadow-sm flex flex-col">
       <Header />
       {/* Tabs */}
       <div className="flex gap-1 px-2 py-2  bg-white">
@@ -72,6 +74,10 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
           search_result.map((item, index) => (
             <li
               key={index}
+              onClick={() => {
+                setSelectedUser(item);
+                navigate("/chat");
+              }}
               className="p-4 hover:bg-gray-100 cursor-pointer flex items-center gap-4"
             >
               <img

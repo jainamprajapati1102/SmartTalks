@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
-import Dashboard from "./pages/Home.jsx";
+import Home from "./pages/Home.jsx";
 import Chatroom from "./pages/ChatRoom.jsx";
 import AuthLayout from "./layouts/authLayout.jsx";
 import MainLayout from "./layouts/mainLayout.jsx";
@@ -20,7 +20,7 @@ function App() {
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* <Route path="/" element={<Navigate to="/login" />} /> */}
 
         {/* Public (Guest) Pages */}
         <Route element={<AuthLayout />}>
@@ -33,8 +33,8 @@ function App() {
         {/* Protected Pages */}
         <Route element={<MainLayout />}>
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/chat" element={<Chatroom />} />
+            <Route path="/" element={<Home />} />
           </Route>
         </Route>
       </Routes>
