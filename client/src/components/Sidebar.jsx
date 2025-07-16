@@ -1,10 +1,11 @@
 // components/Sidebar.jsx
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
-import { search_user } from "../services/userService";
+import { exist_msg, search_user } from "../services/userService";
 import placeholderImg from "../assets/placeholder.png";
 import { useChat } from "../context/SelectedUserContext";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
   const tabs = ["All", "Unread", "Favorites", "Groups"];
@@ -35,9 +36,35 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
 
     return () => clearTimeout(delayDebounce);
   }, [search]);
+
+  useEffect(() => {
+    if (!search?.trim()) {
+      return;
+    } else {
+      const exist_msg_fun = async () => {
+        let formdata = new FormData();
+        let id = Cookies.get("token");
+        formdata.append("id", id);
+        const response = await exist_msg(formdata);
+        // setSearch_result(response.data);
+      };
+      exist_msg_fun();
+    }
+  });
   return (
     <div className="w-[450px] bg-white border-r shadow-sm flex flex-col">
       <Header />
+
+      {/* Search Bar */}
+      <div className="p-2 ">
+        <input
+          type="text"
+          placeholder="Search or start new chat"
+          className="w-full px-3 py-1 rounded-full border text-sm focus:outline-none"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
       {/* Tabs */}
       <div className="flex gap-1 px-2 py-2  bg-white">
         {tabs.map((tab) => (
@@ -55,18 +82,6 @@ const Sidebar = ({ activeTab, setActiveTab, search, setSearch }) => {
           </button>
         ))}
       </div>
-
-      {/* Search Bar */}
-      <div className="p-2 ">
-        <input
-          type="text"
-          placeholder="Search chats"
-          className="w-full px-3 py-1 rounded-full border text-sm focus:outline-none"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
       {/* Chat List */}
       <ul className="overflow-y-auto flex-1">
         {Array.isArray(search_result) &&

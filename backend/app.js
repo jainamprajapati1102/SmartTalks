@@ -1,5 +1,6 @@
 import e from "express";
 import signupRoute from "./routes/user.routes.js";
+import messageRoute from "./routes/message.routes.js";
 import cors from "cors";
 import connectDB from "./db/db_con.js";
 import cookieParser from "cookie-parser";
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 // app.use("/socket.io", socketRoute);
 // app.get('/socket.io/?')z
 app.use("/user", signupRoute);
+app.use("/chat", messageRoute);
 // app.use((err, req, res, next) => {
 //   if (err instanceof multer.MulterError) {
 //     // Multer-specific errors

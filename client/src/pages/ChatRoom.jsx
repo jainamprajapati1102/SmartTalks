@@ -4,6 +4,11 @@ import { FaPaperPlane } from "react-icons/fa";
 import { useChat } from "../context/SelectedUserContext";
 import { useNavigate } from "react-router-dom";
 import placeholderImg from "../assets/placeholder.png";
+import {
+  create_chat_service,
+  get_Message_SelectedUser_services,
+} from "../services/messageService";
+import Cookies from "js-cookie";
 
 const ChatRoom = () => {
   // const socket = useSocket("http://localhost:5000");
@@ -20,15 +25,24 @@ const ChatRoom = () => {
   useEffect(() => {
     if (!selectedUser) {
       navigate("/");
+    } else {
+      const selected_user_msg = async () => {
+        let formdata = new FormData();
+        formdata.append("id", selectedUser._id);
+        const response = await get_Message_SelectedUser_services(formdata);
+        // setMessages((prev) => [...prev, ...response.data.messages]);
+        setMessages(response.data.messages); 
+      };
+      selected_user_msg();
     }
   }, [selectedUser]);
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    // socket.emit("send_message", { text: message });
-    setMessages((prev) => [...prev, { text: message }]);
-    setMessage("");
-  };
+  // const sendMessage = () => {
+  //   if (!message.trim()) return;
+  //   // socket.emit("send_message", { text: message });
+  //   setMessages((prev) => [...prev, { text: message }]);
+  //   setMessage("");
+  // };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -41,6 +55,31 @@ const ChatRoom = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  const sendMessage = async () => {
+    if (!message) return;
+    console.log(message);
+    const formdata = new FormData();
+    let sender_id = Cookies.get("token"); // read cookie
+    formdata.append("sender_id", sender_id); // append to FormData
+    formdata.append("receiver_id", selectedUser?._id);
+    formdata.append("msg", message);
+
+    const chat = await create_chat_service(formdata);
+    if (chat.status == 200) {
+      setMessage("");
+      const newMsg = {
+        msg: message,
+        sender_id: Cookies.get("token"),
+        // add any other necessary fields like _id if returned in `chat.data`
+      };
+      setMessages((prev) => [...prev, newMsg]);
+      setMessage("");
+      console.log("msg send");
+    } else {
+      console.log("not send");
+    }
+  };
   return (
     <div className="flex flex-1 w-full h-full  bg-gray-100">
       {/* Sidebar */}
@@ -101,16 +140,16 @@ const ChatRoom = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-          {messages.map((msg, idx) => (
+          {messages.map((value, idx) => (
             <div
               key={idx}
               className={`max-w-xs md:max-w-md lg:max-w-lg mb-2 px-4 py-2 rounded-lg ${
-                idx % 2 === 0
+                value.receiver_id === selectedUser._id
                   ? "bg-blue-500 text-white self-end ml-auto"
                   : "bg-white text-black self-start"
               }`}
             >
-              {msg.text}
+              {value.msg}
             </div>
           ))}
         </div>

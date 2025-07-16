@@ -29,9 +29,19 @@ export const logoutUser = async () => {
 
 export const search_user = async (formdata) => {
   try {
-    const response = await api.post("user/search_user",formdata);
+    const response = await api.post("user/search_user", formdata);
     return response;
   } catch (error) {
     throw error.message || { msg: "Error In Search User" };
+  }
+};
+
+export const exist_msg = async (formdata) => {
+  try {
+    const response = await api.post("user/exist_msg", formdata);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error.message || { msg: "Error In exist msg" };
   }
 };

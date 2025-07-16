@@ -2,6 +2,8 @@ import { validationResult } from "express-validator";
 import { createUser } from "../service/user.service.js";
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import messageModel from "../models/message.model.js";
+import mongoose from "mongoose";
 export const signup = async (req, res) => {
   // console.log(req);rs
   try {
@@ -53,7 +55,7 @@ export const signin = async (req, res) => {
       res
         .status(200)
         .cookie("token", token, {
-          httpOnly: true,
+          httpOnly: false,
           secure: process.env.NODE_ENV === "production", // true in production
           sameSite: "Lax", // or "Strict"
           maxAge: 24 * 60 * 60 * 1000, // 1 day
@@ -101,11 +103,12 @@ export const search_user = async (req, res) => {
     const { mobile } = req.body;
 
     if (mobile) {
+      let keyword = mobile.trim();
       // const find_user = await userModel.findOne({ mobile });
       const find_user = await userModel.find({
-        mobile: { $regex: mobile.trim() },
+        $or: [{ mobile: { $regex: keyword } }, { name: { $regex: keyword } }],
       });
-      console.log(find_user);
+      // console.log(find_user);
 
       if (find_user) {
         res.status(200).json({ find_user });
@@ -117,5 +120,34 @@ export const search_user = async (req, res) => {
     }
   } catch (error) {
     console.log(error.message);
+  }
+};
+
+export const exist_msg = async (req, res) => {
+  try {
+    const { id } = req.body;
+    let decode_user = jwt.verify(id, "sm?>{}+arttal!_&&*k?@s");
+    // const response = await messageModel.find({ receiver_id: decode_user._id });
+    const receiverId = new mongoose.Types.ObjectId(decode_user._id);
+    const response = await messageModel.aggregate([
+      {
+        $match: { receiver_id: receiverId },
+      },
+      {
+        $group: {
+           _id: "$sender_id",
+          msg: { $push: "$$ROOT" },
+          lastMsgTime: { $last: "$createdAt" },
+        },
+      },
+      {
+        $sort: { lastMsgTime: -1 },
+      },
+    ]);
+    if (response) {
+      res.status(200).send({ exist: response });
+    }
+  } catch (error) {
+    console.log("err frm exist msg-->", error);
   }
 };
