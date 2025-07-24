@@ -1,6 +1,5 @@
 import e from "express";
 import {
-  exist_msg,
   getMe,
   logout,
   search_user,
@@ -25,5 +24,4 @@ router.post("/signin", signin);
 router.post("/logout", logout);
 router.get("/me", getMe);
 router.post("/search_user", search_user);
-router.post('/exist_msg',exist_msg)
 export default router;

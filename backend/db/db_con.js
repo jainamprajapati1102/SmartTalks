@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-mongoose.set('debug',true);
+// mongoose.set('debug',true);
 const connectDB = async () => {
   try {
     await mongoose.connect("mongodb://localhost:27017/SmartTalks");

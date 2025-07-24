@@ -38,7 +38,7 @@ export const search_user = async (formdata) => {
 
 export const exist_msg = async (formdata) => {
   try {
-    const response = await api.post("user/exist_msg", formdata);
+    const response = await api.post("chat/exist_msg", formdata);
     return response;
   } catch (error) {
     console.log(error);

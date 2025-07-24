@@ -5,6 +5,8 @@ import cors from "cors";
 import connectDB from "./db/db_con.js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import { configDotenv } from "dotenv";
+configDotenv();
 connectDB();
 const app = e();
 app.use(

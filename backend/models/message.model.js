@@ -15,6 +15,10 @@ const messageSchema = mongoose.Schema(
     msg: { type: String },
     media: { type: String },
     seen: { type: Boolean, default: false },
+    is_delete: { type: Boolean, default: false },
+    is_delete_all: { type: Boolean, default: false },
+    is_delete_by: [mongoose.Schema.Types.ObjectId],
+    deleted_at: { type: Date, default: null },
   },
   {
     timestamps: true,
